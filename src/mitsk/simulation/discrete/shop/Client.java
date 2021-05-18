@@ -31,26 +31,37 @@ public class Client extends SimulationObject {
         this.id = clienCount;
         this.inQue = false;
         clienCount++;
+        System.out.println("Klient " + this.id + " 1. przybył do sklepu" );
     }
 
     @Override
     public void timeAdvanced() {
         this.simTime = this.getSim().getTime();
-        if(this.inQue == false && (this.timeBeforeCheckOut == this.simTime)) {
+        if(!this.inQue && (this.timeBeforeCheckOut == this.simTime)) {
             Checkout checkout1 = this.getSim().getCheckouts().get(0);
             Checkout checkout2 = this.getSim().getCheckouts().get(1);
-            if(checkout1.getQueLength() <= checkout2.getQueLength()){
+            if(checkout1.isOpen() && !checkout2.isOpen()) {
                 checkoutImStanding = checkout1;
                 checkout1.joinQue(this);
             }
-            else {
+            else if(checkout1.isOpen() && checkout2.isOpen()) {
+                if (checkout1.getQueLength() <= checkout2.getQueLength()) {
+                    checkoutImStanding = checkout1;
+                    checkout1.joinQue(this);
+                } else {
+                    checkoutImStanding = checkout2;
+                    checkout2.joinQue(this);
+                }
+            }
+            else if(!checkout1.isOpen() && checkout2.isOpen()) {
                 checkoutImStanding = checkout2;
                 checkout2.joinQue(this);
             }
             this.inQue = true;
+            System.out.println("Klient " + this.id + " 2. udał się do kasy" );
             this.timeToLive = this.getSim().getTime() + 5;
         }
-        if(this.inQue == true && this.timeToLive == this.simTime) {
+        if(this.inQue && this.timeToLive == this.simTime) {
             Range t0 = new Range(1, 2, 25);
             Range t1 = new Range(3, 5, 75);
             Weighted weightedGen = new Weighted(new Range[]{t0, t1});
@@ -59,10 +70,14 @@ public class Client extends SimulationObject {
             if(isLeaving >= 1.0 && isLeaving <= 2.0) {
                 checkoutImStanding.leaveQue(this);
                 this.getSim().unregister(this);
+                System.out.println("Klient " + this.id + " 3. stracił cierpliwość i wyszedł" );
             }
             else{
                 this.timeToLive = this.getSim().getTime() + 2;
             }
         }
+    }
+    public int getId() {
+        return id;
     }
 }

@@ -29,8 +29,9 @@ public class Simulation {
     public void register(SimulationObject obj) { this.addedObjects.add(obj); }
     public void unregister(SimulationObject obj) { this.removedObjects.add(obj); }
 
-    public void run() {
+    public void run() throws InterruptedException {
         while(this.simTime <= this.maxSimulationTime) {
+            //Thread.sleep(1000);
             for (Iterator<SimulationObject> it = objects.iterator(); it.hasNext();) {
                 SimulationObject next = it.next();
                 next.timeAdvanced();
@@ -42,7 +43,6 @@ public class Simulation {
             }
             removedObjects.clear();
             addedObjects.clear();
-            System.out.println("SimTime: " + this.simTime);
             this.simTime += this.step;
         }
         this.simTime = -1;
