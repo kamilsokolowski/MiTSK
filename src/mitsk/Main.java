@@ -7,18 +7,18 @@ import mitsk.simulation.discrete.step.Simulation;
 public class Main {
 
     public static void main(String[] args) {
-        Simulation sklepi1 = new Simulation(200, 1);
-        Checkout c1 = new Checkout(sklepi1, 1, true);
-        Checkout c2 = new Checkout(sklepi1, 2, false);
-        c1.setNeighbourCheckout(c2);
-        c2.setNeighbourCheckout(null);
-        sklepi1.register(new ClientStream(sklepi1));
-        sklepi1.register(c1);
-        sklepi1.register(c2);
-        sklepi1.setCheckouts(c1);
-        sklepi1.setCheckouts(c2);
+        Simulation sklep = new Simulation(200, 1);
+        Checkout kasa1 = new Checkout(sklep, 1, true);
+        Checkout kasa2 = new Checkout(sklep, 2, false);
+        kasa1.setNeighbourCheckout(kasa2);
+        kasa2.setNeighbourCheckout(null);
+        sklep.register(new ClientStream(sklep));
+        sklep.register(kasa1);
+        sklep.register(kasa2);
+        sklep.setCheckouts(kasa1);
+        sklep.setCheckouts(kasa2);
         try {
-            sklepi1.run();
+            sklep.run();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

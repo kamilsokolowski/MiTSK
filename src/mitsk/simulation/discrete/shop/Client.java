@@ -25,7 +25,7 @@ public class Client extends SimulationObject {
         this.id = clienCount;
         this.inQue = false;
         clienCount++;
-        System.out.println("Klient " + this.id + " 1. przybył do sklepu" );
+        System.out.println("Klient - " + this.id + " 1. przybył do sklepu" );
     }
 
     @Override
@@ -57,7 +57,7 @@ public class Client extends SimulationObject {
                 checkout2.joinQue(this);
             }
             this.inQue = true; // zapalenie flagi po dołączeniu do kolejki
-            System.out.println("Klient " + this.id + " 2. udał się do kasy" );
+            System.out.println("Klient - " + this.id + " 2. udał się do kasy" );
             this.timeToLeave = this.getSim().getTime() + 5; // ustawienie czasu po którym klient zaczni się niecierpliwić
         }
         // obsługa niecierpliwenia się klienta
@@ -71,7 +71,7 @@ public class Client extends SimulationObject {
                 // opuszczenie sklepu przez klienta
                 checkoutImStanding.leaveQue(this);
                 this.getSim().unregister(this);
-                System.out.println("Klient " + this.id + " 3. stracił cierpliwość i wyszedł" );
+                System.out.println("Klient - " + this.id + " 3. stracił cierpliwość i wyszedł" );
             }
             else{
                 this.timeToLeave = this.getSim().getTime() + 2;

@@ -53,7 +53,6 @@ public class Simulation {
             objects.removeAll(removedObjects); // usunięcie obiektó symulacyjnych
             addedObjects.clear(); // wyczyszczenie listy obiektów do dodania
             removedObjects.clear(); // wyczyszczenie listy obiektów do usunięcia
-            System.out.println(this.simTime);
             this.simTime += this.step; // aktualizacja czasu symulacji
         }
         this.simTime = -1; // zakończenie symulacji

@@ -51,7 +51,6 @@ public class Checkout extends SimulationObject {
             }
             // ustawienei czasu obsługi klienta w momencie gdy kolejka była pusta
             if(!this.isTimeToHandleClientSet){
-                System.out.println("Kasjer " + this.idCheckout + " 1. podjął klienta" );
                 double time = weightedGen.getNext();
                 if(time >= 1 && time <= 2) {
                     this.timeToHandleClient = this.getSim().getTime() + 1;
@@ -68,14 +67,17 @@ public class Checkout extends SimulationObject {
             }
             // obsługa klienta
             if(this.timeToHandleClient == this.simTime){
-                this.timeToHandleClient = -1;
                 Client clnt = this.queue.get(0); // uchywtu do pierwszego klienta w kolejce
+                System.out.println("Kasjer - " + this.idCheckout + " 1. podjął klienta" );
+                //System.out.println("Kasjer - " + this.idCheckout + " 1. podjął Klienta - " + clnt.getId());
                 this.queue.remove(clnt); // usunięcie klienta z kolejki
                 this.getSim().unregister(clnt); // wyrejestrowanie klienta z symulacji
                 this.queLength = this.queue.size(); // aktualizacja romiaru kolejki
                 this.lastClientServedTime = this.simTime; // momenu obsługi ostatniego klienta
-                System.out.println("Klient " + clnt.getId() + " 4. został obsłużony" );
-                System.out.println("Kasjer " + this.idCheckout + " 2. zakończył obsługę klienta" );
+                System.out.println("Klient - " + clnt.getId() + " 4. został obsłużony" );
+                System.out.println("Kasjer - " + this.idCheckout + " 2. zakończył obsługę klienta" );
+                //System.out.println("Kasjer - " + this.idCheckout + " 2. zakończył obsługę Klienta - " + clnt.getId());
+                this.timeToHandleClient = -1;
                 double time = weightedGen.getNext(); // określenie czasu do obsługi następnego klienta
                 while(this.timeToHandleClient == -1) {
                     if (time >= 1 && time <= 2) {
