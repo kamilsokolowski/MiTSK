@@ -9,6 +9,7 @@ public class Weighted implements Generator{
     private List<Range> ranges;
 
     public Weighted(Range[] ranges) {
+
         this.ranges = new ArrayList<Range>();
         this.ranges.addAll(Arrays.asList(ranges));
     }
@@ -30,6 +31,7 @@ public class Weighted implements Generator{
             }
             s += r.getWeight();
         }
+        number = rand.nextDouble();
         return number * (ren.getMax() - ren.getMin()) + ren.getMin();
     }
 }

@@ -2,7 +2,7 @@ package mitsk.generators;
 
 import java.util.Random;
 
-public class Uniform implements Generator{
+public class Uniform implements Generator {
     private double min;
     private double max;
 
