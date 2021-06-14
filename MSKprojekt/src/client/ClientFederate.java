@@ -24,6 +24,7 @@ import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
+import settigs.SimulationSettings;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -57,9 +58,6 @@ public class ClientFederate
 	protected InteractionClassHandle deviceRepairHandle;
 	// Device parameters
 	protected HashMap<Integer, Client> clients = new HashMap<Integer, Client>();
-	protected boolean serviceManCalledFlag = false;
-
-	protected int numberOfClients = 10;
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
@@ -205,20 +203,23 @@ public class ClientFederate
 		/////////////////////////////////////
 		// 10. do the main simulation loop //
 		/////////////////////////////////////
-		for(int i = 0; i < this.numberOfClients; ++i){
-			Client clnt = new Client();
+		for(int i = 0; i < SimulationSettings.numberOfClients; ++i){
+			Client clnt = new Client(i);
 			this.clients.put(clnt.getIdClient(), clnt);
 		}
+
 		while( fedamb.isRunning )
 		{
-			Iterator hmIterator = clients.entrySet().iterator();
-			while (hmIterator.hasNext()) {
-				Map.Entry mapElement = (Map.Entry)hmIterator.next();
-				Integer key = (Integer) mapElement.getKey();
-				Client clnt = (Client) mapElement.getValue();
-				if(!clnt.isDeviceOperational() && !clnt.isServiceCalled()) {
+			for (Map.Entry<Integer, Client> integerClientEntry : clients.entrySet()) {
+				Client clnt = (Client) ((Map.Entry) integerClientEntry).getValue();
+				if (!clnt.isDeviceOperational() && !clnt.isServiceCalled()) {
 					callServiceMan(clnt);
 				}
+				System.out.println(
+						"Client with id: " + clnt.getIdClient()
+						+ " Device operational state is: " + clnt.isDeviceOperational()
+						+ " State of calling seviceman is : " + clnt.isServiceCalled()
+				);
 			}
 			advanceTime(1);
 			log( "Time Advanced to " + fedamb.federateTime );
@@ -298,37 +299,6 @@ public class ClientFederate
 	{
 		publish();
 		subscribe();
-		/*
-		// Publish Client class
-		this.clientHandle = rtiamb.getObjectClassHandle( "HLAobjectRoot.Client" );
-		this.clientIdClientHandle = rtiamb.getAttributeHandle( clientHandle, "idClient" );
-		this.clientDistanceToFirm = rtiamb.getAttributeHandle( clientHandle, "distanceToFirm" );
-		// package the information into a handle set
-		AttributeHandleSet attributes = rtiamb.getAttributeHandleSetFactory().create();
-		attributes.add( clientDistanceToFirm );
-		attributes.add( clientIdClientHandle );
-		// Publish
-		rtiamb.publishObjectClassAttributes(clientHandle, attributes);
-
-		// Publish callServiceManInteractin
-		String iname = "HLAinteractionRoot.ServiceManagment.callServiceMan";
-		callServiceManHandle = rtiamb.getInteractionClassHandle( iname );
-		// Publish
-		rtiamb.publishInteractionClass(callServiceManHandle);
-
-		// Subscribe Device class
-		this.deviceHandle = rtiamb.getObjectClassHandle( "HLAobjectRoot.Device" );
-		this.deviceIdDeviceHandle = rtiamb.getAttributeHandle( deviceHandle, "idDevice" );
-		this.deviceIsOperationalHandle = rtiamb.getAttributeHandle( deviceHandle, "isOperational" );
-		this.deviceFreqOfFailureHandle = rtiamb.getAttributeHandle( deviceHandle, "freqOfFailure" );
-		// package the information into a handle set
-		AttributeHandleSet attributes1 = rtiamb.getAttributeHandleSetFactory().create();
-		attributes1.add( deviceIdDeviceHandle );
-		attributes1.add( deviceIsOperationalHandle );
-		attributes1.add( deviceFreqOfFailureHandle );
-		// Subscribe
-		rtiamb.subscribeObjectClassAttributes(deviceHandle, attributes1);
-		 */
 	}
 
 	private void publish() throws RTIexception {
@@ -340,14 +310,12 @@ public class ClientFederate
 
 	private void subscribe() throws RTIexception {
 		deviceIdHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.DeviceManagment"), "DeviceId");
-
 		String iname1 = "HLAinteractionRoot.DeviceManagment.DeviceFailed";
 		deviceFailedHandle = rtiamb.getInteractionClassHandle( iname1 );
 		// Subscribe
 		rtiamb.subscribeInteractionClass(deviceFailedHandle);
 
 		deviceIdHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.DeviceManagment"), "DeviceId");
-
 		String iname2 = "HLAinteractionRoot.DeviceManagment.Repair";
 		deviceRepairHandle = rtiamb.getInteractionClassHandle( iname2 );
 		// Subscribe

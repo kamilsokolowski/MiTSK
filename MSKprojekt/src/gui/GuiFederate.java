@@ -1,8 +1,9 @@
-package statistics;
+package gui;
 
+import client.Client;
+import device.Device;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.EncoderFactory;
-import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.FederatesCurrentlyJoined;
 import hla.rti1516e.exceptions.FederationExecutionAlreadyExists;
 import hla.rti1516e.exceptions.FederationExecutionDoesNotExist;
@@ -10,15 +11,17 @@ import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
+import serviceMan.ServiceMan;
+import settigs.SimulationSettings;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.*;
 
-public class StatisticsFederate {
+public class GuiFederate {
     //----------------------------------------------------------
     //                    STATIC VARIABLES
     //----------------------------------------------------------
@@ -32,29 +35,33 @@ public class StatisticsFederate {
     //                   INSTANCE VARIABLES
     //----------------------------------------------------------
     private RTIambassador rtiamb;
-    private StatisticsFederateAmbassador fedamb;  // created when we connect
+    private GuiFederateAmbassador fedamb;  // created when we connect
     private HLAfloat64TimeFactory timeFactory; // set when we join
     protected EncoderFactory encoderFactory;     // set when we join
 
     // caches of handle types - set once we join a federation
 
     // Interaction handlers
-    protected InteractionClassHandle callServiceManHandle;
-    protected ParameterHandle clientIdHandle;
-
-    protected InteractionClassHandle deviceRepairHandle;
     protected ParameterHandle deviceIdHandle;
+    protected ParameterHandle distanceHandle;
+    protected ParameterHandle clientIdHandle;
+    // Interaction Handlers
+    protected InteractionClassHandle callServiceManHandle;
+    protected InteractionClassHandle deviceFailedHandle;
+    protected InteractionClassHandle deviceRepairHandle;
 
-    private ObjectClassHandle statisticsHandle;
-    private AttributeHandle statisticsAvgHandle;
-    private AttributeHandle statisticsDevHandle;
+    protected ObjectClassHandle statisticsHandle;
+    protected AttributeHandle statisticsAvgHandle;
+    protected AttributeHandle statisticsDevHandle;
 
-    // Statistics data
-    protected HashMap<Integer, StatisticsEntry> serviceHistory = new HashMap<Integer, StatisticsEntry>();
-    protected HashMap<Integer, StatisticsEntry> pendingServices = new HashMap<Integer, StatisticsEntry>();
-
+    // Gui data
     protected int avg;
     protected int deviation;
+
+    protected ArrayList<Client> clientsList = new ArrayList<Client>();
+    protected ArrayList<Device> deviceList = new ArrayList<Device>();
+    protected ArrayList<ServiceMan> serviceManList = new ArrayList<ServiceMan>();
+   // protected LinkedHashMap<Integer, Integer> calls = new LinkedHashMap<Integer, Integer>();
 
     //----------------------------------------------------------
     //                      CONSTRUCTORS
@@ -68,7 +75,7 @@ public class StatisticsFederate {
      */
     private void log( String message )
     {
-        System.out.println( "StatisticsFederate   : " + message );
+        System.out.println( "GuiFederate   : " + message );
     }
 
     /**
@@ -108,7 +115,7 @@ public class StatisticsFederate {
 
         // connect
         log( "Connecting..." );
-        fedamb = new StatisticsFederateAmbassador( this );
+        fedamb = new GuiFederateAmbassador( this );
         rtiamb.connect( fedamb, CallbackModel.HLA_EVOKED );
 
         //////////////////////////////
@@ -141,7 +148,7 @@ public class StatisticsFederate {
         // 4. join the federation //
         ////////////////////////////
         rtiamb.joinFederationExecution( federateName,            // name for the federate
-                "statistics",   // federate type
+                "gui",   // federate type
                 "ServiceFederation"     // name of federation
         );           // modules we want to add
 
@@ -200,27 +207,36 @@ public class StatisticsFederate {
         /////////////////////////////////////
         // 9. register an object to update //
         /////////////////////////////////////
-        ObjectInstanceHandle objectHandle = rtiamb.registerObjectInstance( statisticsHandle );
-        log( "Registered Storage, handle=" + objectHandle );
+
 //		// 10. do the main simulation loop //
         /////////////////////////////////////
         // here is where we do the meat of our work. in each iteration, we will
         // update the attribute values of the object we registered, and will
         // send an interaction.
+        for(int i = 0; i < SimulationSettings.numberOfClients; ++i){
+            Client clnt = new Client(i);
+            this.clientsList.add(clnt);
+        }
+        for(int i = 0; i < SimulationSettings.numberOfDevices; ++i){
+            Device dev = new Device(i);
+            this.deviceList.add(dev);
+        }
+        for(int i = 0; i < SimulationSettings.numberOfServiceMan; ++i){
+            ServiceMan srvm = new ServiceMan(i);
+            this.serviceManList.add(srvm);
+        }
+
         while( fedamb.isRunning )
         {
-            this.avg = Statistics.average(serviceHistory);
-            this.deviation = Statistics.standardDeviation(serviceHistory);
-            AttributeHandleValueMap attributes = rtiamb.getAttributeHandleValueMapFactory().create(2);
-
-            HLAinteger32BE average = encoderFactory.createHLAinteger32BE( this.avg );
-            attributes.put( statisticsAvgHandle, average.toByteArray() );
-
-            HLAinteger32BE dev = encoderFactory.createHLAinteger32BE( this.deviation );
-            attributes.put( statisticsDevHandle, dev.toByteArray() );
-
-            rtiamb.updateAttributeValues( objectHandle, attributes, generateTag() );
-
+            for(int i = 0; i < SimulationSettings.numberOfClients; ++i){
+                System.out.println(clientsList.get(i));
+            }
+            for(int i = 0; i < SimulationSettings.numberOfDevices; ++i){
+                System.out.println(deviceList.get(i));
+            }
+            for(int i = 0; i < SimulationSettings.numberOfServiceMan; ++i){
+                System.out.println(serviceManList.get(i));
+            }
             System.out.println("Average time of service: " + this.avg + " +/- " + this.deviation);
             advanceTime(1);
             log( "Time Advanced to " + fedamb.federateTime );
@@ -308,6 +324,29 @@ public class StatisticsFederate {
     }
 
     private void publish() throws RTIexception {
+
+    }
+
+    private void subscribe() throws RTIexception {
+        deviceIdHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.DeviceManagment"), "DeviceId");
+        String iname1 = "HLAinteractionRoot.DeviceManagment.DeviceFailed";
+        deviceFailedHandle = rtiamb.getInteractionClassHandle( iname1 );
+        // Subscribe
+        rtiamb.subscribeInteractionClass(deviceFailedHandle);
+
+        deviceIdHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.DeviceManagment"), "DeviceId");
+        String iname2 = "HLAinteractionRoot.DeviceManagment.Repair";
+        deviceRepairHandle = rtiamb.getInteractionClassHandle( iname2 );
+        // Subscribe
+        rtiamb.subscribeInteractionClass(deviceRepairHandle);
+
+        distanceHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.ServiceManagment"), "Distance");
+        clientIdHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.ServiceManagment"), "ClientID");
+        String iname3 = "HLAinteractionRoot.ServiceManagment.callServiceMan";
+        callServiceManHandle = rtiamb.getInteractionClassHandle( iname3 );
+        // Subscribe
+        rtiamb.subscribeInteractionClass(callServiceManHandle);
+
         this.statisticsHandle = rtiamb.getObjectClassHandle( "HLAobjectRoot.Statistics" );
         this.statisticsAvgHandle = rtiamb.getAttributeHandle( statisticsHandle, "avg" );
         this.statisticsDevHandle = rtiamb.getAttributeHandle( statisticsHandle, "dev" );
@@ -316,24 +355,7 @@ public class StatisticsFederate {
         attributes.add( statisticsAvgHandle );
         attributes.add( statisticsDevHandle );
         // Publish
-        rtiamb.publishObjectClassAttributes(statisticsHandle, attributes);
-    }
-
-    private void subscribe() throws RTIexception {
-        clientIdHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.ServiceManagment"), "ClientID");
-
-        String iname1 = "HLAinteractionRoot.ServiceManagment.callServiceMan";
-        callServiceManHandle = rtiamb.getInteractionClassHandle( iname1 );
-        // Subscribe
-        rtiamb.subscribeInteractionClass(callServiceManHandle);
-
-        deviceIdHandle = rtiamb.getParameterHandle(rtiamb.getInteractionClassHandle("HLAinteractionRoot.DeviceManagment"), "DeviceId");
-
-        String iname2 = "HLAinteractionRoot.DeviceManagment.Repair";
-        deviceRepairHandle = rtiamb.getInteractionClassHandle( iname2 );
-        // Subscribe
-        rtiamb.subscribeInteractionClass(deviceRepairHandle);
-
+        rtiamb.subscribeObjectClassAttributes(statisticsHandle, attributes);
     }
 
     /**
@@ -372,7 +394,7 @@ public class StatisticsFederate {
     public static void main( String[] args )
     {
         // get a federate name, use "exampleFederate" as default
-        String federateName = "Statistics";
+        String federateName = "Gui";
         if( args.length != 0 )
         {
             federateName = args[0];
@@ -381,7 +403,7 @@ public class StatisticsFederate {
         try
         {
             // run the example federate
-            new StatisticsFederate().runFederate( federateName );
+            new GuiFederate().runFederate( federateName );
         }
         catch( Exception rtie )
         {
@@ -390,3 +412,4 @@ public class StatisticsFederate {
         }
     }
 }
+

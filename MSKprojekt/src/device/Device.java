@@ -1,17 +1,17 @@
 package device;
 
+import settigs.SimulationSettings;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Device {
     private int idDevice;
     private boolean isOperational;
     private int timeToFailure;
-    private static int numberOfDevices = 0;
 
-    public Device() {
-        this.idDevice = numberOfDevices;
+    public Device(int id) {
+        this.idDevice = id;
         this.isOperational = true;
-        numberOfDevices ++;
     }
 
     public int getIdDevice() {
@@ -35,14 +35,16 @@ public class Device {
     }
 
     public void setTimeToFailure(int timeToFailure) {
-        this.timeToFailure = timeToFailure + ThreadLocalRandom.current().nextInt(10, 20 + 1);
+        this.timeToFailure = timeToFailure + ThreadLocalRandom.current().nextInt(
+                SimulationSettings.minDeviceTimeToFailure, SimulationSettings.maxDeviceTimeToFailure + 1
+        );
     }
 
-    public static int getNumberOfDevices() {
-        return numberOfDevices;
-    }
-
-    public static void setNumberOfDevices(int numberOfDevices) {
-        Device.numberOfDevices = numberOfDevices;
+    @Override
+    public String toString() {
+        return "Device{" +
+                "idDevice=" + idDevice +
+                ", isOperational=" + isOperational +
+                '}';
     }
 }

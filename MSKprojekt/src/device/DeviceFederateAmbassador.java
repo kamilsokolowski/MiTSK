@@ -267,11 +267,8 @@ public class DeviceFederateAmbassador extends NullFederateAmbassador
 					builder.append("\tcount Value=" + deviceId);
 				}
 			}
-			Iterator hmIterator = this.federate.devices.entrySet().iterator();
-			while (hmIterator.hasNext()) {
-				Map.Entry mapElement = (Map.Entry) hmIterator.next();
-				Integer key = (Integer) mapElement.getKey();
-				Device dev = (Device) mapElement.getValue();
+			for (Map.Entry<Integer, Device> integerDeviceEntry : this.federate.devices.entrySet()) {
+				Device dev = (Device) ((Map.Entry) integerDeviceEntry).getValue();
 				if (!dev.isOperational() && dev.getIdDevice() == deviceId) {
 					dev.setOperational(true);
 					dev.setTimeToFailure((int) this.federateTime);

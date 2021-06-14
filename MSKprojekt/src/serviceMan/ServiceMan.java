@@ -8,13 +8,11 @@ public class ServiceMan {
     private int clientId;
     private int timeToClient;
     private boolean isAvailable;
-    private static int numberOfServiceMan;
 
-    public ServiceMan() {
-        this.idServiceMan = numberOfServiceMan;
+    public ServiceMan(int id) {
+        this.idServiceMan = id;
         this.timeToClient = -1;
         this.isAvailable = true;
-        numberOfServiceMan++;
     }
 
     public int getIdServiceMan() {
@@ -49,15 +47,15 @@ public class ServiceMan {
         isAvailable = available;
     }
 
-    public static int getNumberOfServiceMan() {
-        return numberOfServiceMan;
-    }
-
-    public static void setNumberOfServiceMan(int numberOfServiceMan) {
-        ServiceMan.numberOfServiceMan = numberOfServiceMan;
-    }
-
     public void applyObstructionDelay(int delay) {
         this.timeToClient += delay;
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceMan{" +
+                "idServiceMan=" + idServiceMan +
+                ", isAvailable=" + isAvailable +
+                '}';
     }
 }

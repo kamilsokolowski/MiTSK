@@ -187,61 +187,6 @@ public class ClientFederateAmbassador extends NullFederateAmbassador
 		// print the attribute information
 		builder.append( ", attributeCount=" + theAttributes.size() );
 		builder.append( "\n" );
-		/*
-		for( AttributeHandle attributeHandle : theAttributes.keySet() )
-		{
-			// print the attibute handle
-			builder.append( "\tattributeHandle=" );
-
-			// Handle specific atttribute vaule
-			if ( attributeHandle.equals(federate.deviceIdDeviceHandle) ) {
-				builder.append( attributeHandle );
-				builder.append( " (IdDevice)    " );
-				builder.append( ", attributeValue=" );
-				HLAinteger32BE available = new HLA1516eInteger32BE();
-				try {
-					available.decode(theAttributes.get(attributeHandle));
-				} catch (DecoderException e) {
-					e.printStackTrace();
-				}
-				builder.append( available.getValue() );
-				federate.idDevice = available.getValue();
-			}
-			else if( attributeHandle.equals(federate.deviceIsOperationalHandle) ) {
-				builder.append( attributeHandle );
-				builder.append( " (IsOperational)    " );
-				builder.append( ", attributeValue=" );
-				HLAboolean available = new HLA1516eBoolean();
-				try {
-					available.decode(theAttributes.get(attributeHandle));
-				} catch (DecoderException e) {
-					e.printStackTrace();
-				}
-				builder.append( available.getValue() );
-				federate.deviceIsOperational = available.getValue();
-			}
-			else if ( attributeHandle.equals(federate.deviceFreqOfFailureHandle) ) {
-				builder.append( attributeHandle );
-				builder.append( " (Frequancy)    " );
-				builder.append( ", attributeValue=" );
-				HLAinteger32BE available = new HLA1516eInteger32BE();
-				try {
-					available.decode(theAttributes.get(attributeHandle));
-				} catch (DecoderException e) {
-					e.printStackTrace();
-				}
-				builder.append( available.getValue() );
-				federate.freq = available.getValue();
-			}
-			else
-			{
-				builder.append( attributeHandle );
-				builder.append( " (Unknown)   " );
-			}
-
-			builder.append( "\n" );
-		}*/
-
 		log( builder.toString() );
 	}
 
@@ -298,8 +243,6 @@ public class ClientFederateAmbassador extends NullFederateAmbassador
 				int idDevice = id.getValue();
 				builder.append( "\tcount Value=" + idDevice );
 				federate.clients.get(idDevice).setDeviceOperational(false);
-				//System.out.println("Client id: " + federate.clients.get(idDevice).getIdClient() + " device id :" + idDevice);
-				//System.out.println(federateTime);
 			}
 		}
 		if( interactionClass.equals(federate.deviceRepairHandle) ) {
@@ -319,11 +262,8 @@ public class ClientFederateAmbassador extends NullFederateAmbassador
 					builder.append("\tcount Value=" + deviceId);
 				}
 			}
-			Iterator hmIterator = this.federate.clients.entrySet().iterator();
-			while (hmIterator.hasNext()) {
-				Map.Entry mapElement = (Map.Entry) hmIterator.next();
-				Integer key = (Integer) mapElement.getKey();
-				Client clnt = (Client) mapElement.getValue();
+			for (Map.Entry<Integer, Client> integerClientEntry : this.federate.clients.entrySet()) {
+				Client clnt = (Client) ((Map.Entry) integerClientEntry).getValue();
 				if (!clnt.isDeviceOperational() && clnt.getIdClient() == deviceId) {
 					clnt.setDeviceOperational(true);
 					clnt.setServiceCalled(false);

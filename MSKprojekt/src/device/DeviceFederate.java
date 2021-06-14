@@ -24,6 +24,7 @@ import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
+import settigs.SimulationSettings;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -54,8 +55,6 @@ public class DeviceFederate
 	protected InteractionClassHandle deviceFailedHandle;
 	// Local variables and lists
 	protected HashMap<Integer, Device> devices = new HashMap<Integer, Device>();
-
-	protected int numberOfDevices = 10;
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
 	//----------------------------------------------------------
@@ -208,8 +207,8 @@ public class DeviceFederate
 		// send an interaction.
 
 		// Initilize devices for clients
-		for(int i = 0; i < this.numberOfDevices; ++i){
-			Device dev = new Device();
+		for(int i = 0; i < SimulationSettings.numberOfDevices; ++i){
+			Device dev = new Device(i);
 			dev.setTimeToFailure((int)fedamb.federateTime);
 			this.devices.put(dev.getIdDevice(), dev);
 		}
@@ -218,16 +217,15 @@ public class DeviceFederate
 		{
 			//updateStatus(objectHandle);
 
-			Iterator hmIterator = devices.entrySet().iterator();
-			while (hmIterator.hasNext()) {
-				Map.Entry mapElement = (Map.Entry)hmIterator.next();
-				Integer key = (Integer) mapElement.getKey();
-				Device dev = (Device) mapElement.getValue();
-				if(fedamb.federateTime == dev.getTimeToFailure()) {
+			for (Map.Entry<Integer, Device> integerDeviceEntry : devices.entrySet()) {
+				Device dev = (Device) ((Map.Entry) integerDeviceEntry).getValue();
+				if (fedamb.federateTime == dev.getTimeToFailure()) {
 					dev.setOperational(false);
 					fail(dev.getIdDevice());
 				}
-				//System.out.println(dev.getIdDevice() + " " + dev.isOperational());
+				System.out.println(
+						"Device with id: " + dev.getIdDevice() + " is operational state is: " + dev.isOperational()
+				);
 			}
 			advanceTime(1);
 			log( "Time Advanced to " + fedamb.federateTime );
@@ -307,28 +305,6 @@ public class DeviceFederate
 	{
 		publish();
 		subscribe();
-		/*
-
-		// publish Device class
-		this.deviceHandle = rtiamb.getObjectClassHandle( "HLAobjectRoot.Device" );
-		this.deviceIdDeviceHandle = rtiamb.getAttributeHandle( deviceHandle, "idDevice" );
-		this.deviceIsOperationalHandle = rtiamb.getAttributeHandle( deviceHandle, "isOperational" );
-		this.deviceFreqOfFailureHandle = rtiamb.getAttributeHandle( deviceHandle, "freqOfFailure" );
-		// Pack attributes
-		AttributeHandleSet attributes = rtiamb.getAttributeHandleSetFactory().create();
-		attributes.add( deviceIdDeviceHandle );
-		attributes.add( deviceIsOperationalHandle );
-		attributes.add( deviceFreqOfFailureHandle );
-		// Publish
-		rtiamb.publishObjectClassAttributes( deviceHandle, attributes );
-
-		// subscribe Repair Interaction
-		String iname = "HLAinteractionRoot.DeviceManagment.Repair";
-		repairHandle = rtiamb.getInteractionClassHandle( iname );
-		// Subscribe
-		rtiamb.subscribeInteractionClass(repairHandle)
-
-		 */
 	}
 	private void publish() throws RTIexception {
 		String iname1 = "HLAinteractionRoot.DeviceManagment.DeviceFailed";
@@ -374,31 +350,15 @@ public class DeviceFederate
 		return ("(timestamp) " + System.currentTimeMillis()).getBytes();
 	}
 
-	private void updateStatus(ObjectInstanceHandle objectHandle) throws Exception{
-		/*
-		AttributeHandleValueMap attributes = rtiamb.getAttributeHandleValueMapFactory().create(3);
-		// Send idDevice field value
-		HLAinteger32BE idDevice = encoderFactory.createHLAinteger32BE( Device.getInstance().getIdDevice());
-		attributes.put( deviceIdDeviceHandle, idDevice.toByteArray() );
-		// Send isOperational field value
-		HLAboolean isOperational = encoderFactory.createHLAboolean( Device.getInstance().isOperational());
-		attributes.put( deviceIsOperationalHandle, isOperational.toByteArray() );
-		// Send freqOfFailure field value
-		//HLAinteger32BE freqOfFailure = encoderFactory.createHLAinteger32BE( Device.getInstance().getFreqOfFailure());
-		//attributes.put( deviceFreqOfFailureHandle, freqOfFailure.toByteArray() );
-		// Send
-		//rtiamb.updateAttributeValues( objectHandle, attributes, generateTag() );
-
-		 */
-	}
 	private void fail(int idDevice) throws Exception{
 		ParameterHandleValueMap parameterHandleValueMap = rtiamb.getParameterHandleValueMapFactory().create(1);
 		ParameterHandle callServiceManDistanceHandle = rtiamb.getParameterHandle(deviceFailedHandle, "DeviceId");
+
 		HLAinteger32BE idDev = encoderFactory.createHLAinteger32BE(idDevice);
 		parameterHandleValueMap.put(callServiceManDistanceHandle, idDev.toByteArray());
+
 		rtiamb.sendInteraction(deviceFailedHandle, parameterHandleValueMap, generateTag());
 	}
-
 
 	//----------------------------------------------------------
 	//                     STATIC METHODS

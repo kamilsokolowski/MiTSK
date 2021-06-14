@@ -103,6 +103,33 @@
 					<semantics>State of equipment</semantics>
 				</attribute>
 			</objectClass>
+			<objectClass>
+				<name>Statistics</name>
+				<sharing>PublishSubscribe</sharing>
+				<semantics>Class calculating statistics for simulation</semantics>
+				<attribute>
+					<name>avg</name>
+					<dataType>HLAinteger32BE</dataType>
+					<updateType>Static</updateType>
+					<updateCondition>On Change</updateCondition>
+					<ownership>Divest</ownership>
+					<sharing>PublishSubscribe</sharing>
+					<transportation>HLAreliable</transportation>
+					<order>Receive</order>
+					<semantics>Average time of service</semantics>
+				</attribute>
+				<attribute>
+					<name>dev</name>
+					<dataType>HLAinteger32BE</dataType>
+					<updateType>Static</updateType>
+					<updateCondition>On Change</updateCondition>
+					<ownership>Divest</ownership>
+					<sharing>PublishSubscribe</sharing>
+					<transportation>HLAreliable</transportation>
+					<order>Receive</order>
+					<semantics>Deviation from service average</semantics>
+				</attribute>
+			</objectClass>
 		</objectClass>
 	</objects>
 	<interactions>

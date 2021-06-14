@@ -1,27 +1,38 @@
 package client;
 
-import java.util.Random;
+import settigs.SimulationSettings;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Created by Stanislaw on 08.05.2018.
+ * This class represents Client in simulation.
  */
 
 public class Client {
     private int idClient;
     private int distanceToFirm;
     private boolean serviceCalled;
-    private static int numberOfClients = 0;
     private Device myDevice;
 
-    public Client() {
-        this.idClient = numberOfClients;
-        this.distanceToFirm = ThreadLocalRandom.current().nextInt(15, 30 + 1);
+    /**
+     * Creates Client with given id number. Id should be uniq among all clients.
+     * During creation Client is assigned with distance to service firm as time required to arrive to Client.
+     * Minimal distance to firm is given in SimulationSettings.minClientDistance and maximum distance
+     * is given in SimulationSettings.maxClientDistance.
+     * Client is associated with Device by Id number. It means Client with idClient = 0 operates Device
+     * with idDevice = 0.
+     */
+    public Client(int id) {
+        this.idClient = id;
+        this.distanceToFirm = ThreadLocalRandom.current().nextInt(
+                SimulationSettings.minClientDistance, SimulationSettings.maxClientDistance + 1
+        );
         this.serviceCalled = false;
         this.myDevice = new Device(this.idClient, true);
-        numberOfClients++;
     }
-
+    /**
+     * Set of public helper methods. Helper methods are getters and setters.
+     * */
     public int getIdClient() {
         return idClient;
     }
@@ -52,5 +63,15 @@ public class Client {
 
     public boolean isDeviceOperational() {
         return this.myDevice.isOperational();
+    }
+    /**
+     * Override of toString method for easier displaying.
+     * */
+    @Override
+    public String toString() {
+        return "Client{" +
+                "idClient=" + idClient +
+                ", serviceCalled=" + serviceCalled +
+                '}';
     }
 }

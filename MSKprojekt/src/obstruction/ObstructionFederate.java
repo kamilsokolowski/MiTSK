@@ -24,6 +24,7 @@ import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
+import settigs.SimulationSettings;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,8 +38,6 @@ public class ObstructionFederate
     //----------------------------------------------------------
     //                    STATIC VARIABLES
     //----------------------------------------------------------
-    /** The number of times we will update our attributes and send an interaction */
-    public static final int ITERATIONS = 20;
 
     /** The sync point all federates will sync up on before starting */
     public static final String READY_TO_RUN = "ReadyToRun";
@@ -57,12 +56,9 @@ public class ObstructionFederate
     // Interaction handlers
     protected InteractionClassHandle obstructionHandle;
 
-    protected int minDelayOccurrence = 10;
-    protected int maxDelayOccurrence = 50;
-    protected int minDelay = 5;
-    protected int maxDelay = 15;
-    protected int numberOfServiceMens = 2;
-    protected int timeToNextObstruction = (int) (ThreadLocalRandom.current().nextInt(this.minDelayOccurrence, this.maxDelayOccurrence));
+    protected int timeToNextObstruction = (int) (ThreadLocalRandom.current().nextInt(
+            SimulationSettings.minDelayOccurrence, SimulationSettings.maxDelayOccurrence)
+    );
 
     //----------------------------------------------------------
     //                      CONSTRUCTORS
@@ -321,11 +317,11 @@ public class ObstructionFederate
         ParameterHandle obstructionServiceManIdHandle = rtiamb.getParameterHandle(obstructionHandle, "ServiceManId");
         ParameterHandle obstructionDelayHandle = rtiamb.getParameterHandle(obstructionHandle, "Delay");
 
-        int serviceManIdTmp = ThreadLocalRandom.current().nextInt(0, this.numberOfServiceMens);
+        int serviceManIdTmp = ThreadLocalRandom.current().nextInt(0, SimulationSettings.numberOfServiceMan);
         //System.out.println(serviceManIdTmp);
         //int serviceManIdTmp = 0;
         HLAinteger32BE serviceManId = encoderFactory.createHLAinteger32BE(serviceManIdTmp);
-        int delayTmp = ThreadLocalRandom.current().nextInt(this.minDelay, this.maxDelay);
+        int delayTmp = ThreadLocalRandom.current().nextInt(SimulationSettings.minDelayTime, SimulationSettings.maxDelayTime);
         HLAinteger32BE delay = encoderFactory.createHLAinteger32BE(delayTmp);
 
         parameterHandleValueMap.put(obstructionServiceManIdHandle, serviceManId.toByteArray());
@@ -333,8 +329,14 @@ public class ObstructionFederate
 
         rtiamb.sendInteraction(obstructionHandle, parameterHandleValueMap, generateTag());
 
-        this.timeToNextObstruction = (int) (this.fedamb.federateTime + ThreadLocalRandom.current().nextInt(this.minDelayOccurrence, this.maxDelayOccurrence));
-        //System.out.println("obstruction send");
+        this.timeToNextObstruction = (int) (this.fedamb.federateTime + ThreadLocalRandom.current().nextInt(
+                SimulationSettings.minDelayOccurrence, SimulationSettings.maxDelayOccurrence)
+        );
+
+        System.out.println(
+                "Service man with id:" + serviceManIdTmp
+                + " is affected by obstruction. Added :" + delayTmp + "simtime units to service time."
+        );
     }
 
     /**

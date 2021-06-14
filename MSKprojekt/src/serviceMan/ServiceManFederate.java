@@ -24,6 +24,7 @@ import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
+import settigs.SimulationSettings;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,8 +67,6 @@ public class ServiceManFederate
 	// Array of Servicemans
 	protected HashMap<Integer, ServiceMan> serviceMens = new HashMap<Integer, ServiceMan>();
 	protected LinkedHashMap<Integer, Integer> calls = new LinkedHashMap<Integer, Integer>();
-
-	protected int numberOfServiceMan = 3;
 
 	//----------------------------------------------------------
 	//                      CONSTRUCTORS
@@ -214,8 +213,8 @@ public class ServiceManFederate
 		// 9. register an object to update //
 		/////////////////////////////////////
 
-		for(int i = 0; i < this.numberOfServiceMan; ++i){
-			ServiceMan srvm = new ServiceMan();
+		for(int i = 0; i < SimulationSettings.numberOfServiceMan; ++i){
+			ServiceMan srvm = new ServiceMan(i);
 			this.serviceMens.put(srvm.getIdServiceMan(), srvm);
 		}
 
@@ -226,11 +225,8 @@ public class ServiceManFederate
 		// send an interaction.
 		while( fedamb.isRunning )
 		{
-			Iterator hmIterator = this.serviceMens.entrySet().iterator();
-			while (hmIterator.hasNext()) {
-				Map.Entry mapElement = (Map.Entry) hmIterator.next();
-				Integer key = (Integer) mapElement.getKey();
-				ServiceMan srvm = (ServiceMan) mapElement.getValue();
+			for (Map.Entry<Integer, ServiceMan> integerServiceManEntry : this.serviceMens.entrySet()) {
+				ServiceMan srvm = (ServiceMan) ((Map.Entry) integerServiceManEntry).getValue();
 				if (srvm.isAvailable()) {
 					try {
 						Map.Entry<Integer, Integer> entry = calls.entrySet().stream().findFirst().get();
@@ -239,17 +235,21 @@ public class ServiceManFederate
 						srvm.setTimeToClient((int) (this.fedamb.federateTime + distance));
 						srvm.setClientId(clientId);
 						srvm.setAvailable(false);
-						calls.remove( clientId );
-					} catch (Exception e) {}
+						calls.remove(clientId);
+					} catch (Exception e) {
+						//System.out.println(e.getMessage());
+					}
 				}
-				if(srvm.getTimeToClient() == this.fedamb.federateTime && !srvm.isAvailable()) {
+				if (srvm.getTimeToClient() == this.fedamb.federateTime && !srvm.isAvailable()) {
 					repair(srvm.getClientId());
 					srvm.setClientId(0);
 					srvm.setTimeToClient(-1);
 					srvm.setAvailable(true);
 				}
-				//System.out.println(srvm.getClientId() + " " + srvm.getTimeToClient());
-				//System.out.println(calls);
+				System.out.println("Service man with id: " + srvm.getIdServiceMan()
+						+ " is going to client with id: " + srvm.getClientId()
+						+ " in simtime: " + srvm.getTimeToClient()
+				);
 			}
 			advanceTime(1);
 			log( "Time Advanced to " + fedamb.federateTime );
