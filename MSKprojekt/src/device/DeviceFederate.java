@@ -357,7 +357,9 @@ public class DeviceFederate
 		HLAinteger32BE idDev = encoderFactory.createHLAinteger32BE(idDevice);
 		parameterHandleValueMap.put(callServiceManDistanceHandle, idDev.toByteArray());
 
-		rtiamb.sendInteraction(deviceFailedHandle, parameterHandleValueMap, generateTag());
+		HLAfloat64Time time = timeFactory.makeTime( fedamb.federateTime+fedamb.federateLookahead );
+
+		rtiamb.sendInteraction(deviceFailedHandle, parameterHandleValueMap, generateTag(), time);
 	}
 
 	//----------------------------------------------------------

@@ -365,7 +365,9 @@ public class ClientFederate
 		parameterHandleValueMap.put(callServiceManDistanceHandle, dist.toByteArray());
 		parameterHandleValueMap.put(callServiceManClientIdHandle, clntId.toByteArray());
 
-		rtiamb.sendInteraction(callServiceManHandle, parameterHandleValueMap, generateTag());
+		HLAfloat64Time time = timeFactory.makeTime( fedamb.federateTime+fedamb.federateLookahead );
+
+		rtiamb.sendInteraction(callServiceManHandle, parameterHandleValueMap, generateTag(), time);
 
 		clnt.setServiceCalled(true);
 	}

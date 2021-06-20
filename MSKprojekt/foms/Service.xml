@@ -23,7 +23,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Identification number of Device</semantics>
 				</attribute>
 				<attribute>
@@ -34,7 +34,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>State of equipment</semantics>
 				</attribute>
 				<attribute>
@@ -45,7 +45,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Frequency of Device failure</semantics>
 				</attribute>
 			</objectClass>
@@ -61,7 +61,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Identification number of ServiceMan</semantics>
 				</attribute>
 				<attribute>
@@ -72,7 +72,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Time of arrival to Client</semantics>
 				</attribute>
 			</objectClass>
@@ -88,7 +88,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Identification number of Client</semantics>
 				</attribute>
 				<attribute>
@@ -99,7 +99,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>State of equipment</semantics>
 				</attribute>
 			</objectClass>
@@ -115,7 +115,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Average time of service</semantics>
 				</attribute>
 				<attribute>
@@ -126,7 +126,7 @@
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Deviation from service average</semantics>
 				</attribute>
 			</objectClass>
@@ -139,7 +139,7 @@
 				<name>DeviceManagment</name>
 				<sharing>PublishSubscribe</sharing>
 				<transportation>HLAreliable</transportation>
-				<order>Receive</order>
+				<order>TimeStamp</order>
 				<semantics>Event for managing device</semantics>
 				<parameter>
 					<name>DeviceId</name>
@@ -150,14 +150,14 @@
 					<name>Repair</name>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Event of changing product sate from broken to working</semantics>
 				</interactionClass>
 				<interactionClass>
 					<name>DeviceFailed</name>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Interaction called when device is not operational</semantics>
 				</interactionClass>
 			</interactionClass>
@@ -165,7 +165,7 @@
 				<name>ServiceManagment</name>
 				<sharing>PublishSubscribe</sharing>
 				<transportation>HLAreliable</transportation>
-				<order>Receive</order>
+				<order>TimeStamp</order>
 				<semantics>Event for managing serviceman</semantics>
 				<parameter>
 					<name>ClientID</name>
@@ -181,14 +181,14 @@
 					<name>callServiceMan</name>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Event of ccalling service man</semantics>
 				</interactionClass>
 				<interactionClass>
 					<name>Obstruction</name>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
+					<order>TimeStamp</order>
 					<semantics>Event for managing serviceman</semantics>
 					<parameter>
 						<name>ServiceManId</name>

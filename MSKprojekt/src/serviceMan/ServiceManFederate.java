@@ -384,9 +384,12 @@ public class ServiceManFederate
 	private void repair(int idDevice) throws Exception{
 		ParameterHandleValueMap parameterHandleValueMap = rtiamb.getParameterHandleValueMapFactory().create(1);
 		ParameterHandle callServiceManDistanceHandle = rtiamb.getParameterHandle(repairHandle, "DeviceId");
+
 		HLAinteger32BE idDev = encoderFactory.createHLAinteger32BE(idDevice);
 		parameterHandleValueMap.put(callServiceManDistanceHandle, idDev.toByteArray());
-		rtiamb.sendInteraction(repairHandle, parameterHandleValueMap, generateTag());
+
+		HLAfloat64Time time = timeFactory.makeTime( fedamb.federateTime+fedamb.federateLookahead );
+		rtiamb.sendInteraction(repairHandle, parameterHandleValueMap, generateTag(), time);
 	}
 
 	private short getTimeAsShort()

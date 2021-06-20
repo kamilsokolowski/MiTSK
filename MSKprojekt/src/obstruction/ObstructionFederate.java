@@ -327,7 +327,9 @@ public class ObstructionFederate
         parameterHandleValueMap.put(obstructionServiceManIdHandle, serviceManId.toByteArray());
         parameterHandleValueMap.put(obstructionDelayHandle, delay.toByteArray());
 
-        rtiamb.sendInteraction(obstructionHandle, parameterHandleValueMap, generateTag());
+        HLAfloat64Time time = timeFactory.makeTime( fedamb.federateTime+fedamb.federateLookahead );
+
+        rtiamb.sendInteraction(obstructionHandle, parameterHandleValueMap, generateTag(), time);
 
         this.timeToNextObstruction = (int) (this.fedamb.federateTime + ThreadLocalRandom.current().nextInt(
                 SimulationSettings.minDelayOccurrence, SimulationSettings.maxDelayOccurrence)
