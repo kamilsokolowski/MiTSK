@@ -38,8 +38,6 @@ public class ServiceManFederate
 	//----------------------------------------------------------
 	//                    STATIC VARIABLES
 	//----------------------------------------------------------
-	/** The number of times we will update our attributes and send an interaction */
-	public static final int ITERATIONS = 20;
 
 	/** The sync point all federates will sync up on before starting */
 	public static final String READY_TO_RUN = "ReadyToRun";
@@ -249,6 +247,7 @@ public class ServiceManFederate
 				System.out.println("Service man with id: " + srvm.getIdServiceMan()
 						+ " is going to client with id: " + srvm.getClientId()
 						+ " in simtime: " + srvm.getTimeToClient()
+						+ " is available: " + srvm.isAvailable()
 				);
 			}
 			advanceTime(1);

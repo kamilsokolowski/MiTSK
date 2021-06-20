@@ -22,9 +22,6 @@ public class StatisticsFederate {
     //----------------------------------------------------------
     //                    STATIC VARIABLES
     //----------------------------------------------------------
-    /** The number of times we will update our attributes and send an interaction */
-    public static final int ITERATIONS = 20;
-
     /** The sync point all federates will sync up on before starting */
     public static final String READY_TO_RUN = "ReadyToRun";
 
@@ -219,7 +216,9 @@ public class StatisticsFederate {
             HLAinteger32BE dev = encoderFactory.createHLAinteger32BE( this.deviation );
             attributes.put( statisticsDevHandle, dev.toByteArray() );
 
-            rtiamb.updateAttributeValues( objectHandle, attributes, generateTag() );
+            HLAfloat64Time time = timeFactory.makeTime( fedamb.federateTime+fedamb.federateLookahead );
+
+            rtiamb.updateAttributeValues( objectHandle, attributes, generateTag(), time);
 
             System.out.println("Average time of service: " + this.avg + " +/- " + this.deviation);
             advanceTime(1);
@@ -333,7 +332,6 @@ public class StatisticsFederate {
         deviceRepairHandle = rtiamb.getInteractionClassHandle( iname2 );
         // Subscribe
         rtiamb.subscribeInteractionClass(deviceRepairHandle);
-
     }
 
     /**

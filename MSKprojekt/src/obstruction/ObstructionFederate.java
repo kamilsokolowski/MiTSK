@@ -336,8 +336,8 @@ public class ObstructionFederate
         );
 
         System.out.println(
-                "Service man with id:" + serviceManIdTmp
-                + " is affected by obstruction. Added :" + delayTmp + "simtime units to service time."
+                "Service man with id: " + serviceManIdTmp
+                + " is affected by obstruction. Added: " + delayTmp + " simtime units to service time."
         );
     }
 

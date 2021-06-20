@@ -11,6 +11,7 @@ import hla.rti1516e.exceptions.RTIexception;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
+import javafx.application.Application;
 import serviceMan.ServiceMan;
 import settigs.SimulationSettings;
 
@@ -25,8 +26,6 @@ public class GuiFederate {
     //----------------------------------------------------------
     //                    STATIC VARIABLES
     //----------------------------------------------------------
-    /** The number of times we will update our attributes and send an interaction */
-    public static final int ITERATIONS = 20;
 
     /** The sync point all federates will sync up on before starting */
     public static final String READY_TO_RUN = "ReadyToRun";
@@ -61,7 +60,6 @@ public class GuiFederate {
     protected ArrayList<Client> clientsList = new ArrayList<Client>();
     protected ArrayList<Device> deviceList = new ArrayList<Device>();
     protected ArrayList<ServiceMan> serviceManList = new ArrayList<ServiceMan>();
-   // protected LinkedHashMap<Integer, Integer> calls = new LinkedHashMap<Integer, Integer>();
 
     //----------------------------------------------------------
     //                      CONSTRUCTORS
@@ -230,15 +228,35 @@ public class GuiFederate {
         {
             for(int i = 0; i < SimulationSettings.numberOfClients; ++i){
                 System.out.println(clientsList.get(i));
+				if(clientsList.get(i).isServiceCalled()){
+                    Gui.changeImgClient(i,true);
+                }
+                else{
+                    Gui.changeImgClient(i,false);
+                }
             }
             for(int i = 0; i < SimulationSettings.numberOfDevices; ++i){
                 System.out.println(deviceList.get(i));
+				if(deviceList.get(i).isOperational()){
+                    Gui.changeImgEq(i,true);
+                }
+                else{
+                    Gui.changeImgEq(i,false);
+                }
             }
             for(int i = 0; i < SimulationSettings.numberOfServiceMan; ++i){
                 System.out.println(serviceManList.get(i));
+				if(serviceManList.get(i).isAvailable()){
+                    Gui.changeImgWorker(i,true);
+                }
+                else{
+                    Gui.changeImgWorker(i,false);
+                }
             }
             System.out.println("Average time of service: " + this.avg + " +/- " + this.deviation);
-            advanceTime(1);
+            Gui.changeAverage(this.avg);
+            Gui.changeDeviation(this.deviation);
+			advanceTime(1);
             log( "Time Advanced to " + fedamb.federateTime );
         }
 
@@ -393,6 +411,10 @@ public class GuiFederate {
     //----------------------------------------------------------
     public static void main( String[] args )
     {
+		Thread guiLaunch = new Thread(() -> {
+            Application.launch(Gui.class, args);
+        });
+        guiLaunch.start();
         // get a federate name, use "exampleFederate" as default
         String federateName = "Gui";
         if( args.length != 0 )

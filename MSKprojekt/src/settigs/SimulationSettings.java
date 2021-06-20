@@ -4,8 +4,8 @@ public class SimulationSettings {
     /**
      * IMPORTANT NOTE! numberOfClients and numberOfDevices MUST be equal.
      * */
-    public static int numberOfClients = 5;
-    public static int numberOfDevices = 5;
+    public static int numberOfClients = 8;
+    public static int numberOfDevices = 8;
     public static int numberOfServiceMan = 3;
 
     public static int minClientDistance = 15;
